@@ -20,5 +20,5 @@ authors:
   - given-names: Quan Z.
     family-names: Sheng
     affiliation: "Beijing Normal-Hong Kong Baptist University, China"
-# TODO before release: add version/date and the paper's preferred-citation
-# block (venue, year, DOI) once published.
+version: "0.1.0"
+date-released: 2026-11-25
