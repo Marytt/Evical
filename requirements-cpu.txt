@@ -1,0 +1,8 @@
+# Enough for tests, smoke test and result reproduction (no GPU, no model download)
+torch
+numpy
+pandas
+scipy
+scikit-learn
+pyyaml
+pytest

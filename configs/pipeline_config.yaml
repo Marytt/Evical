@@ -1,0 +1,123 @@
+# EC-Head Pipeline Configuration
+# Single config file — all experiments reproducible from this
+
+pipeline:
+  seed: 42                # SPLIT seed (train/val split + layer sweep). Main results: 42.
+                          # Confidence-head seeds are passed separately (--seeds 42,43,44).
+  val_frac: 0.10
+  layer_fracs: [0.6, 0.7, 0.8, 0.9]
+  retrain_on_full: true
+  stratify_split: true    # stratify train/val on the (y_NA, y_NAP) pattern
+
+# Active dataset. Included in the cache identity, so switching datasets
+# automatically invalidates feature caches.
+dataset: medabstain
+
+datasets:
+  medabstain:
+    kind: url
+    base_url: "https://raw.githubusercontent.com/sravanthi6m/MedAbstain/main/data/"
+    train_file: "perturbed_blended_few_shot_pool_medqa_1_train_noabst.json"
+    pool_file:  "few_shot_pool_medqa_1_train_noabst.json"
+    test_na:    "medqa_1_test_noabst.json"
+    test_nap:   "perturbed_medqa_1_test_noabst.json"
+    version:    "medabstain-medqa-v1"
+    n_options:  5
+
+  mediq:
+    kind: paired_jsonl          # one file, records tagged variant=NA|NAP
+    path: "data/mediq/mediq_na_nap.jsonl"   # produced by scripts/prepare_mediq.py
+    version: "mediq-na-nap-v1"
+    n_options: 4
+    # held out entirely for transfer; set test_frac<1.0 to also train on it
+    test_frac: 1.0
+    split_seed: 42
+
+data:
+  base_url: "https://raw.githubusercontent.com/sravanthi6m/MedAbstain/main/data/"
+  train_file: "perturbed_blended_few_shot_pool_medqa_1_train_noabst.json"
+  pool_file:  "few_shot_pool_medqa_1_train_noabst.json"
+  test_na:    "medqa_1_test_noabst.json"
+  test_nap:   "perturbed_medqa_1_test_noabst.json"
+  # bump this string whenever the source files change -> invalidates caches
+  version:    "medabstain-medqa-v1"
+
+extraction:
+  # Read position. The prompt ends by ASKING for the format, so the model's
+  # next token is "Answer" -- NOT the option letter. We must append this prefix
+  # so that logits/hidden states are read where the letter is actually decided.
+  answer_prefix: "Answer:"
+  max_length: 2048        # hard tokenizer truncation, identical for all models
+  save_every: 200         # write partial cache every N items (resumable)
+  hf_cache_dir: null      # explicit HF cache dir; null = HF default
+
+head:
+  hidden_dim: 256
+  dropout: 0.10
+  epochs_sweep: 8
+  epochs_final: 10
+  batch_size: 16
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  grad_clip: 1.0
+  patience: 3
+  alpha_cal: 1.0
+  beta_ec: 0.5
+  ec_mode: "graded"
+  margin_delta: 0.10
+
+evaluation:
+  ucer_threshold: 0.80
+  ece_bins: 10
+  n_bootstrap: 2000
+  selective_thresholds: [0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+
+models:
+  Qwen2.5-7B-Instruct:
+    model_name: "Qwen/Qwen2.5-7B-Instruct"
+    prompt_mode: "chat"
+    conf_scale: "T9"
+    run_ec_kl: true
+    attn_implementation: null
+
+  Meta-Llama-3-8B-Instruct:
+    model_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+    prompt_mode: "chat"
+    conf_scale: "T100"
+    run_ec_kl: true
+    attn_implementation: null
+
+  Ministral-8B-Instruct-2410:
+    model_name: "mistralai/Ministral-8B-Instruct-2410"
+    prompt_mode: "chat"
+    conf_scale: "T9"
+    run_ec_kl: true
+    attn_implementation: null
+
+  Gemma-2-9B-Instruct:
+    model_name: "google/gemma-2-9b-it"
+    prompt_mode: "chat"
+    conf_scale: "T9"
+    run_ec_kl: false
+    attn_implementation: null   # attention backend (null = library default; e.g. "eager")
+
+  Phi-4-Mini-Instruct:
+    model_name: "microsoft/Phi-4-mini-instruct"
+    prompt_mode: "chat"
+    conf_scale: "T9"
+    run_ec_kl: false
+    attn_implementation: null
+
+  Llama-3.1-8B-Instruct:
+    model_name: "meta-llama/Llama-3.1-8B-Instruct"
+    prompt_mode: "chat"
+    conf_scale: "T100"
+    run_ec_kl: false
+    attn_implementation: null
+
+  Mistral-7B-v0.3:
+    model_name: "mistralai/Mistral-7B-Instruct-v0.3"
+    prompt_mode: "chat"
+    conf_scale: "T9"
+    run_ec_kl: false
+    attn_implementation: null

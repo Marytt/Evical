@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper."
+title: "EVICAL: Evidence-Sensitive Confidence Estimation for Large Language Models in Medical Question Answering"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/Marytt/Evical"
+authors:
+  - given-names: Maryam
+    family-names: Tahermazandarani
+    affiliation: "School of Computing, Macquarie University, Australia"
+  - given-names: Adnan
+    family-names: Mahmood
+    affiliation: "School of Computing, Macquarie University, Australia"
+  - given-names: Manoj Madushanka
+    family-names: Perera
+    affiliation: "School of Computing, Macquarie University, Australia"
+  - given-names: Fahmida
+    family-names: Islam
+    affiliation: "School of Computing, Macquarie University, Australia"
+  - given-names: Quan Z.
+    family-names: Sheng
+    affiliation: "Beijing Normal-Hong Kong Baptist University, China"
+# TODO before release: add version/date and the paper's preferred-citation
+# block (venue, year, DOI) once published.
